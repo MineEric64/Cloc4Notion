@@ -30,11 +30,16 @@ namespace Cloc4Notion
                     if (string.IsNullOrWhiteSpace(line)) Count.Blank++;
                     else
                     {
-                        if (line.StartsWith("![")) Count.Picture++;
-                        else Count.Character += line.Length;
-
-                        Count.Word += line.Split(' ').Length;
-                        Count.Line++;
+                        if (!line.StartsWith("!["))
+                        {
+                            Count.Character += line.Length;
+                            Count.Word += line.Split(' ').Length;
+                            Count.Line++;
+                        }
+                        else
+                        {
+                            Count.Picture++;
+                        }
                     }
                 }
 
