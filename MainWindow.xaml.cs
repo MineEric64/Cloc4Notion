@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Win32;
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -19,6 +21,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using Cloc4Notion.Extensions;
+
 using Path = System.IO.Path;
 
 using AlphaFile = Alphaleonis.Win32.Filesystem.File;
@@ -32,8 +36,11 @@ namespace Cloc4Notion
     /// </summary>
     public partial class MainWindow : Window
     {
-        string TempDirectory => Path.GetTempPath() + "Cloc4Notion";
-        Page CurrentPage { get; set; } = null;
+        public static string TempDirectory => Path.GetTempPath() + "Cloc4Notion";
+        public static Page CurrentLoadedPage { get; set; } = null;
+        public static Page CurrentPage { get; set; } = null;
+
+        public static bool IncludedSubPages { get; private set; } = true;
 
         public MainWindow()
         {
@@ -42,18 +49,24 @@ namespace Cloc4Notion
             AppContext.SetSwitch("Switch.System.IO.BlockLongPaths", false);
 
             this.Closing += MainWindow_Closing;
-
-            Load(@"D:\ericseyoun\게임\[Notion Archives]\Notion_Game_Plan_Backuped_5.zip"); //for test
+            AppDomain.CurrentDomain.UnhandledException += MainWindow_UnhandledException;
         }
 
         private void MainWindow_Closing(object sender, CancelEventArgs e)
         {
-            AlphaDirectory.Delete(TempDirectory, true);
+            if (AlphaDirectory.Exists(TempDirectory)) AlphaDirectory.Delete(TempDirectory, true);
+        }
+
+        private void MainWindow_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            var ex = (Exception)e.ExceptionObject;
+            MessageBox.Show(ex.ToCleanString(), "Cloc4Notion: Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         public void Load(string path)
         {
             CurrentPage = null;
+            CurrentLoadedPage = null;
 
             using (var unzip = new Unzip(path))
             {
@@ -68,17 +81,18 @@ namespace Cloc4Notion
                     if (hashExists) //it's Page
                     {
                         string content = AlphaFile.ReadAllText(Path.Combine(TempDirectory, fileName));
-                        if (CurrentPage == null) CurrentPage = new Page(name, content);
+                        if (CurrentLoadedPage == null) CurrentLoadedPage = new Page(name, content);
 
                         string parent = GetParent(validFileName);
-                        Page currentSubPage = GetSelectedPage(parent);
+                        string parentNormalized = string.Join("/", GetNormalizedParents(parent));
+                        Page currentSubPage = GetSelectedPage(parentNormalized);
 
-                        currentSubPage.Add(new Page(name, content));
+                        currentSubPage.Add(new Page(name, content, parentNormalized));
                     }
                 }
-
-                Debug.WriteLine(CurrentPage.CountAllSubPages());
             }
+
+            CurrentPage = CurrentLoadedPage;
         }
 
         public string GetNormalizedPageName(string name, out bool hashExists)
@@ -149,22 +163,125 @@ namespace Cloc4Notion
             return string.Join(@"/", validPaths);
         }
 
-        public Page GetSelectedPage(string parent)
+        public Page GetSelectedPage(string path)
         {
-            List<string> parents = new List<string>(GetNormalizedParents(parent));
-            Page currentSubPage = CurrentPage;
+            Page currentSubPage = CurrentLoadedPage;
 
-            foreach (string dir in parents)
+            if (!string.IsNullOrWhiteSpace(path))
             {
-                if (currentSubPage == null) break;
+                string[] parents = path.Split('/');
 
-                var pages = currentSubPage.SubPages.Where(x => x.Name == dir).ToList();
+                foreach (string dir in parents)
+                {
+                    if (currentSubPage == null) break;
 
-                if (pages.Count > 0) currentSubPage = pages[0];
-                else currentSubPage = null;
+                    var pages = currentSubPage.SubPages.Where(x => x.Name == dir).ToList();
+
+                    if (pages.Count > 0) currentSubPage = pages[0];
+                    else currentSubPage = null;
+                }
             }
 
             return currentSubPage;
+        }
+
+        private void open_Click(object sender, RoutedEventArgs e)
+        {
+            var ofd = new OpenFileDialog();
+            ofd.Filter = "Zip file (*.zip)|*.zip";
+            ofd.Multiselect = false;
+
+            var dialog = ofd.ShowDialog();
+
+            if (dialog.HasValue && dialog.Value)
+            {
+                string name = Path.GetFileNameWithoutExtension(ofd.FileName);
+
+                Load(ofd.FileName);
+                ApplyCurrentPageCountsUI();
+                ApplyTree();
+
+                MessageBox.Show($"'{name}' Sucessfully Loaded!", this.Title, MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
+        private void ApplyCurrentPageCountsUI()
+        {
+            if (CurrentPage == null) return;
+            var counts = IncludedSubPages ? CurrentPage.CountAllSubPages() : CurrentPage.Count;
+
+            this.counts_line.Content = $"Line: {counts.Line:n0}";
+            this.counts_word.Content = $"Word: {counts.Word:n0}";
+            this.counts_character.Content = $"Character: {counts.Character:n0}";
+            this.counts_blank.Content = $"Blank: {counts.Blank:n0}";
+            this.counts_page.Content = $"Page: {counts.Page:n0}";
+            this.counts_picture.Content = $"Picture: {counts.Picture:n0}";
+        }
+
+        private void counts_subpage_Checked(object sender, RoutedEventArgs e)
+        {
+            IncludedSubPages = true;
+            ApplyCurrentPageCountsUI();
+        }
+
+        private void counts_subpage_Unchecked(object sender, RoutedEventArgs e)
+        {
+            IncludedSubPages = false;
+            ApplyCurrentPageCountsUI();
+        }
+
+        private void ApplyTree()
+        {
+            Page page = CurrentLoadedPage;
+
+            TreeViewItem item = new TreeViewItem();
+            item.Header = page.Name;
+            item.Tag = page.FullName;
+            item.Expanded += new RoutedEventHandler(item_Expanded);   // 노드 확장시 추가
+
+            tree_dir.Items.Add(item);
+            GetTreeSubPages(item);
+        }
+
+        private void GetTreeSubPages(TreeViewItem itemParent)
+        {
+            if (itemParent == null) return;
+            if (itemParent.Items.Count != 0) return;
+
+            string path = itemParent.Tag as string;
+            Page page = GetSelectedPage(path);
+
+            foreach (Page subPage in page.SubPages)
+            {
+                TreeViewItem item = new TreeViewItem();
+                item.Header = subPage.Name;
+                item.Tag = subPage.FullName;
+                item.Expanded += new RoutedEventHandler(item_Expanded);
+
+                itemParent.Items.Add(item);
+            }
+        }
+
+        private void item_Expanded(object sender, RoutedEventArgs e)
+        {
+            TreeViewItem itemParent = sender as TreeViewItem;
+
+            if (itemParent == null) return;
+            if (itemParent.Items.Count == 0) return;
+
+            foreach (TreeViewItem item in itemParent.Items)
+            {
+                GetTreeSubPages(item);
+            }
+        }
+
+        private void tree_dir_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            TreeViewItem item = e.NewValue as TreeViewItem;
+            string path = item.Tag as string;
+
+            CurrentPage = GetSelectedPage(path);
+            ApplyCurrentPageCountsUI();
         }
     }
 }

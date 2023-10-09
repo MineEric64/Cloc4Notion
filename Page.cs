@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 
 namespace Cloc4Notion
 {
@@ -15,11 +16,15 @@ namespace Cloc4Notion
         public Counts Count { get; set; } = new Counts();
 
         public List<Page> SubPages { get; set; } = new List<Page>();
+        public string Parent { get; set; } = string.Empty;
+        public string FullName { get; }
 
-        public Page(string name, string content)
+        public Page(string name, string content, string parent = "")
         {
             Name = name;
             Content = content;
+            Parent = parent;
+            FullName = string.IsNullOrWhiteSpace(Parent) ? Name : $"{Parent}/{Name}";
 
             using (StringReader reader = new StringReader(content)) {
                 while (true)
@@ -30,13 +35,17 @@ namespace Cloc4Notion
                     if (string.IsNullOrWhiteSpace(line)) Count.Blank++;
                     else
                     {
-                        if (!line.StartsWith("!["))
+                        bool picture = line.StartsWith("![");
+                        bool link = line.StartsWith("[");
+                        bool title = line.StartsWith("# ");
+
+                        if (!picture && !link && !title)
                         {
                             Count.Character += line.Length;
                             Count.Word += line.Split(' ').Length;
                             Count.Line++;
                         }
-                        else
+                        else if (picture)
                         {
                             Count.Picture++;
                         }

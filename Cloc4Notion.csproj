@@ -34,6 +34,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Cloc4Notion.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -733,6 +736,7 @@
     <Compile Include="AlphaFS\Utils.cs" />
     <Compile Include="AlphaFS\Win32Errors.cs" />
     <Compile Include="Counts.cs" />
+    <Compile Include="Extensions\ExceptionManager.cs" />
     <Compile Include="Unzip.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -771,10 +775,19 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <Resource Include="Resources\NotoSansKR-Regular.otf" />
+    <Resource Include="Resources\JetBrainsMono-Bold.ttf" />
+    <Resource Include="Resources\JetBrainsMono-ExtraBold.ttf" />
+    <Resource Include="Resources\JetBrainsMono-Regular.ttf" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Cloc4Notion.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Cloc4Notion.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
