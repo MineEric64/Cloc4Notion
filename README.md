@@ -6,7 +6,7 @@
 - Absolutely Recursive
 
 # Download
-- [GitHub Release](https://github.com/MineEric64/BetterLiveScreen/releases/latest/download/Cloc4Notion.zip)
+- [GitHub Release](https://github.com/MineEric64/Cloc4Notion/releases/latest/download/Cloc4Notion.zip)
 
 Unfortunately, The app supports Windows 32bit & 64bit only.
 
