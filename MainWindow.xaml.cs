@@ -239,6 +239,7 @@ namespace Cloc4Notion
             item.Tag = page.FullName;
             item.Expanded += new RoutedEventHandler(item_Expanded);   // 노드 확장시 추가
 
+            tree_dir.Items.Clear();
             tree_dir.Items.Add(item);
             GetTreeSubPages(item);
         }
