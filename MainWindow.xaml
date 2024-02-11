@@ -6,9 +6,9 @@
         xmlns:local="clr-namespace:Cloc4Notion"
         mc:Ignorable="d"
         Title="Cloc4Notion" Height="542" Width="1082">
-    <Grid >
+    <Grid x:Name="mainGrid" Background="White" >
         <TreeView x:Name="tree_dir" Margin="16,26,852,19" FontFamily="Noto Sans KR" SelectedItemChanged="tree_dir_SelectedItemChanged"/>
-        <GroupBox Header="Counts" Margin="842,26,26,224" FontFamily="JetBrains Mono ExtraBold" FontSize="14">
+        <GroupBox x:Name="countGroup" Header="Counts" Margin="842,26,26,224" FontFamily="JetBrains Mono ExtraBold" FontSize="14">
             <StackPanel>
                 <Label x:Name="counts_line" Content="Line: 0" FontFamily="JetBrains Mono" FontSize="14"/>
                 <Label x:Name="counts_word" Content="Word: 0" FontFamily="JetBrains Mono" FontSize="14"/>
@@ -16,11 +16,13 @@
                 <Label x:Name="counts_blank" Content="Blank: 0" FontFamily="JetBrains Mono" FontSize="14"/>
                 <Label x:Name="counts_page" Content="Page: 0" FontFamily="JetBrains Mono" FontSize="14"/>
                 <Label x:Name="counts_picture" Content="Picture: 0" FontFamily="JetBrains Mono" FontSize="14"/>
-                <Rectangle HorizontalAlignment="Left" Height="1" Margin="0, 20, 0, 0" VerticalAlignment="Top" Width="277" Fill="#FFCACACA"/>
+                <Rectangle x:Name="divider1" HorizontalAlignment="Left" Height="1" Margin="0, 20, 0, 0" VerticalAlignment="Top" Width="277" Fill="#FFCACACA"/>
                 <CheckBox x:Name="counts_subpage" Margin="0, 8, 0, 0" Content="SubPages Included"  IsChecked="True" FontFamily="JetBrains Mono" FontWeight="Bold" Checked="counts_subpage_Checked" Unchecked="counts_subpage_Unchecked"/>
             </StackPanel>
         </GroupBox>
-        <Button x:Name="open" Content="Load" HorizontalAlignment="Left" Margin="842,291,0,0" VerticalAlignment="Top" Width="197" Height="29" FontFamily="JetBrains Mono" Background="#FFF3F3F3" Click="open_Click"/>
-
+        <Button x:Name="open" Content="Load" HorizontalAlignment="Left" Margin="842,291,0,0" VerticalAlignment="Top" Width="197" Height="29" FontFamily="JetBrains Mono" Click="open_Click"/>
+        <FlowDocumentScrollViewer x:Name="mdViewer" Margin="259,26,260,19" UseLayoutRounding="False" />
+        <Button x:Name="findContent" Content="Find Content" HorizontalAlignment="Left" Margin="842,336,0,0" VerticalAlignment="Top" Width="197" Height="29" FontFamily="JetBrains Mono" Click="findContent_Click"/>
+        <Button x:Name="lightdark" Content="Light / Dark" HorizontalAlignment="Left" Margin="842,380,0,0" VerticalAlignment="Top" Width="197" Height="29" FontFamily="JetBrains Mono" Click="lightdark_Click"/>
     </Grid>
 </Window>

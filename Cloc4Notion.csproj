@@ -737,7 +737,14 @@
     <Compile Include="AlphaFS\Win32Errors.cs" />
     <Compile Include="Counts.cs" />
     <Compile Include="Extensions\ExceptionManager.cs" />
+    <Compile Include="FindContentWindow.xaml.cs">
+      <DependentUpon>FindContentWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Unzip.cs" />
+    <Page Include="FindContentWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -788,6 +795,11 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Cloc4Notion.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Markdig.Wpf">
+      <Version>0.5.0.1</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

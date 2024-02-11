@@ -16,10 +16,15 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Xaml;
+
+using Markdig;
+using Markdig.Wpf;
 
 using Cloc4Notion.Extensions;
 
@@ -29,6 +34,10 @@ using AlphaFile = Alphaleonis.Win32.Filesystem.File;
 using AlphaFileInfo = Alphaleonis.Win32.Filesystem.FileInfo;
 using AlphaDirectory = Alphaleonis.Win32.Filesystem.Directory;
 
+using WpfMarkdown = Markdig.Wpf.Markdown;
+using XamlReader = System.Windows.Markup.XamlReader;
+using Alphaleonis.Win32.Filesystem;
+
 namespace Cloc4Notion
 {
     /// <summary>
@@ -37,10 +46,21 @@ namespace Cloc4Notion
     public partial class MainWindow : Window
     {
         public static string TempDirectory => Path.GetTempPath() + "Cloc4Notion";
+
+        public static Brush DarkBackgroundBrush => new SolidColorBrush(Color.FromArgb(255, 25, 25, 25));
+        public static Brush DarkForegroundBrush => new SolidColorBrush(Color.FromArgb(255, 212, 212, 212));
+
+        public static bool IsLight { get; set; } = true;
+
+        public static Brush CurrentBackgroundBrush => IsLight ? Brushes.White : DarkBackgroundBrush;
+        public static Brush CurrentForegroundBrush => IsLight ? Brushes.Black : DarkForegroundBrush;
+
         public static Page CurrentLoadedPage { get; set; } = null;
         public static Page CurrentPage { get; set; } = null;
 
         public static bool IncludedSubPages { get; private set; } = true;
+
+        private FindContentWindow _findWindow = null;
 
         public MainWindow()
         {
@@ -205,7 +225,7 @@ namespace Cloc4Notion
             }
         }
 
-        private void ApplyCurrentPageCountsUI()
+        public void ApplyCurrentPageCountsUI()
         {
             if (CurrentPage == null) return;
             var counts = IncludedSubPages ? CurrentPage.CountAllSubPages() : CurrentPage.Count;
@@ -216,6 +236,27 @@ namespace Cloc4Notion
             this.counts_blank.Content = $"Blank: {counts.Blank:n0}";
             this.counts_page.Content = $"Page: {counts.Page:n0}";
             this.counts_picture.Content = $"Picture: {counts.Picture:n0}";
+
+            var xaml = WpfMarkdown.ToXaml(CurrentPage.Content, BuildPipeline());
+
+            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(xaml)))
+            {
+                using (var reader = new XamlXmlReader(stream, new XamlSchemaContext()))
+                {
+                    if (XamlReader.Load(reader) is FlowDocument document)
+                    {
+                        mdViewer.Document = document;
+                        foreach (var block in mdViewer.Document.Blocks) block.Foreground = CurrentForegroundBrush;
+                    }
+                }
+            }
+        }
+
+        private static MarkdownPipeline BuildPipeline()
+        {
+            return new MarkdownPipelineBuilder()
+                .UseSupportedExtensions()
+                .Build();
         }
 
         private void counts_subpage_Checked(object sender, RoutedEventArgs e)
@@ -238,6 +279,7 @@ namespace Cloc4Notion
             item.Header = page.Name;
             item.Tag = page.FullName;
             item.Expanded += new RoutedEventHandler(item_Expanded);   // 노드 확장시 추가
+            item.Foreground = CurrentForegroundBrush;
 
             tree_dir.Items.Clear();
             tree_dir.Items.Add(item);
@@ -258,6 +300,7 @@ namespace Cloc4Notion
                 item.Header = subPage.Name;
                 item.Tag = subPage.FullName;
                 item.Expanded += new RoutedEventHandler(item_Expanded);
+                item.Foreground = CurrentForegroundBrush;
 
                 itemParent.Items.Add(item);
             }
@@ -283,6 +326,92 @@ namespace Cloc4Notion
 
             CurrentPage = GetSelectedPage(path);
             ApplyCurrentPageCountsUI();
+        }
+
+        private void lightdark_Click(object sender, RoutedEventArgs e)
+        {
+            IsLight = !IsLight;
+            var b = CurrentBackgroundBrush;
+            var f = CurrentForegroundBrush;
+
+            tree_dir.Background = b;
+            tree_dir.BorderBrush = f;
+            tree_dir.Foreground = f;
+
+            mdViewer.Background = b;
+            mdViewer.BorderBrush = f;
+            mdViewer.Foreground = f;
+
+            countGroup.Foreground = f;
+            counts_line.Foreground = f;
+            counts_word.Foreground = f;
+            counts_character.Foreground = f;
+            counts_blank.Foreground = f;
+            counts_page.Foreground = f;
+            counts_picture.Foreground = f;
+            counts_subpage.Foreground = f;
+
+            if (IsLight)
+            {
+                var b2 = new SolidColorBrush(Color.FromArgb(255, 221, 221, 221));
+                var b3 = new SolidColorBrush(Color.FromArgb(255, 112, 112, 112));
+                var b4 = new SolidColorBrush(Color.FromArgb(255, 202, 202, 202));
+
+                divider1.Fill = b4;
+
+                open.Background = b2;
+                open.BorderBrush = b3;
+                open.Foreground = f;
+
+                findContent.Background = b2;
+                findContent.BorderBrush = b3;
+                findContent.Foreground = f;
+
+                lightdark.Background = b2;
+                lightdark.BorderBrush = b3;
+                lightdark.Foreground = f;
+            }
+            else
+            {
+                divider1.Fill = f;
+
+                open.Background = b;
+                open.BorderBrush = f;
+                open.Foreground = f;
+
+                findContent.Background = b;
+                findContent.BorderBrush = f;
+                findContent.Foreground = f;
+
+                lightdark.Background = b;
+                lightdark.BorderBrush = f;
+                lightdark.Foreground = f;
+            }
+
+            mainGrid.Background = b;
+
+            ApplyCurrentPageCountsUI();
+            ChangeTreeItemForeground();
+
+            _findWindow?.ChangeTheme(IsLight);
+        }
+
+        private void ChangeTreeItemForeground(TreeViewItem item = null)
+        {
+            ItemCollection items = item == null ? tree_dir.Items : item.Items;
+            if (items.Count == 0) return;
+
+            foreach (TreeViewItem item2 in items)
+            {
+                item2.Foreground = CurrentForegroundBrush;
+                ChangeTreeItemForeground(item2);
+            }
+        }
+
+        private void findContent_Click(object sender, RoutedEventArgs e)
+        {
+            _findWindow = new FindContentWindow(this);
+            _findWindow.Show();
         }
     }
 }
