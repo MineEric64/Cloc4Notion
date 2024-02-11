@@ -1,6 +1,5 @@
 # Cloc4Notion
-![demo1](https://github.com/MineEric64/Cloc4Notion/blob/main/docs/demo2.jpg?raw=true)
-![demo1](https://github.com/MineEric64/Cloc4Notion/blob/main/docs/demo3.jpg?raw=true)
+![demo3](https://github.com/MineEric64/Cloc4Notion/blob/main/docs/demo3.png?raw=true)
  > [!NOTE]
  > Count All Page's Words / Lines (and More) for Notion
 
@@ -28,6 +27,12 @@ Unfortunately, The app supports Windows 32bit & 64bit only.
 9. [Download the app](#download) and Run it
 10. Click 'Load' and open the exported file
 11. Enjoy!
+
+# Features
+- Count Page's Count
+- Search the content
+- Light / Dark Support
+![demo2](https://github.com/MineEric64/Cloc4Notion/blob/main/docs/demo2.jpg?raw=true)
 
 ## Library Used
 - [Unzip](https://github.com/yallie/unzip)
