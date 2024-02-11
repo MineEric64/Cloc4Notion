@@ -1,5 +1,6 @@
 # Cloc4Notion
-![demo1](https://github.com/MineEric64/Cloc4Notion/blob/main/docs/demo1.jpg?raw=true)
+![demo1](https://github.com/MineEric64/Cloc4Notion/blob/main/docs/demo2.jpg?raw=true)
+![demo1](https://github.com/MineEric64/Cloc4Notion/blob/main/docs/demo3.jpg?raw=true)
  > [!NOTE]
  > Count All Page's Words / Lines (and More) for Notion
 
@@ -31,6 +32,7 @@ Unfortunately, The app supports Windows 32bit & 64bit only.
 ## Library Used
 - [Unzip](https://github.com/yallie/unzip)
 - [AlphaFS](https://github.com/alphaleonis/AlphaFS)
+- [Markdig-WPF](https://github.com/Kryptos-FR/markdig.wpf)
 
 ## Credit
 - [Icon](https://dribbble.com/shots/14637467-Notion-Big-Sur-Icon)
