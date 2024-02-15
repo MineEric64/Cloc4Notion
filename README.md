@@ -31,7 +31,8 @@ Unfortunately, The app supports Windows 32bit & 64bit only.
 # Features
 - Count Page's Count
 - Search the content
-- Light / Dark Support
+- Light / Dark Theme Support
+
 ![demo2](https://github.com/MineEric64/Cloc4Notion/blob/main/docs/demo2.jpg?raw=true)
 
 ## Library Used
