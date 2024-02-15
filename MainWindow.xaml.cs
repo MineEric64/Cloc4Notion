@@ -322,10 +322,14 @@ namespace Cloc4Notion
         private void tree_dir_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             TreeViewItem item = e.NewValue as TreeViewItem;
-            string path = item.Tag as string;
 
-            CurrentPage = GetSelectedPage(path);
-            ApplyCurrentPageCountsUI();
+            if (item != null)
+            {
+                string path = item.Tag as string;
+
+                CurrentPage = GetSelectedPage(path);
+                ApplyCurrentPageCountsUI();
+            }
         }
 
         private void lightdark_Click(object sender, RoutedEventArgs e)
