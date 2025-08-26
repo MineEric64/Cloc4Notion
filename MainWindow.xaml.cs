@@ -91,7 +91,10 @@ namespace Cloc4Notion
             using (var unzip = new Unzip(path))
             {
                 if (AlphaDirectory.Exists(TempDirectory)) AlphaDirectory.Delete(TempDirectory, true);
-                unzip.ExtractToDirectory(TempDirectory);
+                //Debug.WriteLine("Extracting...");
+                //unzip.ExtractProgress += Unzip_ExtractProgress;
+                unzip.ExtractToDirectory(TempDirectory);                
+                //Debug.WriteLine($"Extracted! ({unzip.FileNames.Count()})");
 
                 foreach (var fileName in unzip.FileNames)
                 {
@@ -113,6 +116,11 @@ namespace Cloc4Notion
             }
 
             CurrentPage = CurrentLoadedPage;
+        }
+
+        private void Unzip_ExtractProgress(object sender, Unzip.FileProgressEventArgs e)
+        {
+            Debug.WriteLine(e.ProgressPercentage);
         }
 
         public string GetNormalizedPageName(string name, out bool hashExists)

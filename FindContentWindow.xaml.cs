@@ -32,8 +32,10 @@ namespace Cloc4Notion
 
         private void findButton_Click(object sender, RoutedEventArgs e)
         {
-            Search(textBox.Text, MainWindow.CurrentLoadedPage);
+            _foundPages.Clear();
             listView.Items.Clear();
+
+            Search(textBox.Text, MainWindow.CurrentLoadedPage);            
 
             foreach (Page page in _foundPages)
             {
@@ -47,6 +49,12 @@ namespace Cloc4Notion
 
         private void Search(string s, Page page)
         {
+            if (page == null)
+            {
+                MessageBox.Show("Please search after loading Notion Page!", this.Name, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                return;
+            }
+
             foreach (Page subPage in page.SubPages)
             {
                 if (subPage.PlainContent.Contains(s)) _foundPages.Add(subPage);
@@ -56,6 +64,8 @@ namespace Cloc4Notion
 
         private void listView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (e.AddedItems.Count <= 0) return;
+
             var item = e.AddedItems[0] as ListViewItem;
 
             if (item != null)

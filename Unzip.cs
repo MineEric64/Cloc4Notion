@@ -228,6 +228,10 @@ namespace Cloc4Notion
         /// <param name="directoryName">Name of the directory.</param>
         public void ExtractToDirectory(string directoryName)
         {
+            //Debug.WriteLine("Loop Starting.");
+            //Debug.WriteLine($"{Entries.Length}");
+            //Debug.WriteLine("Loop Started.");
+
             for (int index = 0; index < Entries.Length; index++)
             {
                 var entry = Entries[index];
@@ -402,6 +406,8 @@ namespace Cloc4Notion
                 // move 1 byte back
                 Stream.Seek(-5, SeekOrigin.Current);
             }
+            //Debug.WriteLine("signature found");
+            //Directory Signature Problem!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
             // read directory properties
             Stream.Seek(6, SeekOrigin.Current);
