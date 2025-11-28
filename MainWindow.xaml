@@ -20,7 +20,8 @@
                 <CheckBox x:Name="counts_subpage" Margin="0, 8, 0, 0" Content="SubPages Included"  IsChecked="True" FontFamily="JetBrains Mono" FontWeight="Bold" Checked="counts_subpage_Checked" Unchecked="counts_subpage_Unchecked"/>
             </StackPanel>
         </GroupBox>
-        <Button x:Name="open" Content="Load" HorizontalAlignment="Left" Margin="842,291,0,0" VerticalAlignment="Top" Width="197" Height="29" FontFamily="JetBrains Mono" Click="open_Click"/>
+        <Button x:Name="open" Content="Load" HorizontalAlignment="Left" Margin="842,291,0,0" VerticalAlignment="Top" Width="98" Height="29" FontFamily="JetBrains Mono" Click="open_Click"/>
+        <Button x:Name="open2" Content="Obsidian" HorizontalAlignment="Left" Margin="949,291,0,0" VerticalAlignment="Top" Width="90" Height="29" FontFamily="JetBrains Mono" Click="open2_Click"/>
         <FlowDocumentScrollViewer x:Name="mdViewer" Margin="259,26,260,19" UseLayoutRounding="False" />
         <Button x:Name="findContent" Content="Find Content" HorizontalAlignment="Left" Margin="842,336,0,0" VerticalAlignment="Top" Width="197" Height="29" FontFamily="JetBrains Mono" Click="findContent_Click"/>
         <Button x:Name="lightdark" Content="Light / Dark" HorizontalAlignment="Left" Margin="842,380,0,0" VerticalAlignment="Top" Width="197" Height="29" FontFamily="JetBrains Mono" Click="lightdark_Click"/>

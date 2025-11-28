@@ -1,5 +1,9 @@
-﻿using Microsoft.Win32;
-
+﻿using Alphaleonis.Win32.Filesystem;
+using Cloc4Notion.Extensions;
+using Markdig;
+using Markdig.Wpf;
+using Microsoft.Win32;
+using Ookii.Dialogs.Wpf;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,6 +12,7 @@ using System.IO;
 using System.IO.Packaging;
 using System.Linq;
 using System.Runtime.InteropServices.ComTypes;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -22,21 +27,13 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Xaml;
-
-using Markdig;
-using Markdig.Wpf;
-
-using Cloc4Notion.Extensions;
-
-using Path = System.IO.Path;
-
+using AlphaDirectory = Alphaleonis.Win32.Filesystem.Directory;
+using AlphaDirectoryInfo = Alphaleonis.Win32.Filesystem.DirectoryInfo;
 using AlphaFile = Alphaleonis.Win32.Filesystem.File;
 using AlphaFileInfo = Alphaleonis.Win32.Filesystem.FileInfo;
-using AlphaDirectory = Alphaleonis.Win32.Filesystem.Directory;
-
+using Path = System.IO.Path;
 using WpfMarkdown = Markdig.Wpf.Markdown;
 using XamlReader = System.Windows.Markup.XamlReader;
-using Alphaleonis.Win32.Filesystem;
 
 namespace Cloc4Notion
 {
@@ -120,7 +117,7 @@ namespace Cloc4Notion
 
         private void Unzip_ExtractProgress(object sender, Unzip.FileProgressEventArgs e)
         {
-            Debug.WriteLine(e.ProgressPercentage);
+            //Debug.WriteLine(e.ProgressPercentage);
         }
 
         public string GetNormalizedPageName(string name, out bool hashExists)
@@ -142,9 +139,9 @@ namespace Cloc4Notion
             return converted.Normalize();
         }
 
-        public string GetParent(string path)
+        public string GetParent(string path, char seperator = '/')
         {
-            int index = path.LastIndexOf('/');
+            int index = path.LastIndexOf(seperator);
 
             if (index == -1) return string.Empty; //root
             return path.Substring(0, index);
@@ -191,7 +188,7 @@ namespace Cloc4Notion
             return string.Join(@"/", validPaths);
         }
 
-        public Page GetSelectedPage(string path)
+        public Page GetSelectedPage(string path, bool obsidian = false)
         {
             Page currentSubPage = CurrentLoadedPage;
 
@@ -206,6 +203,15 @@ namespace Cloc4Notion
                     var pages = currentSubPage.SubPages.Where(x => x.Name == dir).ToList();
 
                     if (pages.Count > 0) currentSubPage = pages[0];
+                    else if (obsidian)
+                    {
+                        string dir2Parent = currentSubPage.Name;
+                        if (!string.IsNullOrEmpty(currentSubPage.Parent)) dir2Parent = string.Concat(currentSubPage.Parent, "/", dir2Parent);
+                        var dir2 = new Page(dir, string.Empty, string.Join("/", dir2Parent));
+
+                        currentSubPage.SubPages.Add(dir2);
+                        currentSubPage = dir2;
+                    }
                     else currentSubPage = null;
                 }
             }
@@ -375,6 +381,10 @@ namespace Cloc4Notion
                 open.BorderBrush = b3;
                 open.Foreground = f;
 
+                open2.Background = b2;
+                open2.BorderBrush = b3;
+                open2.Foreground = f;
+
                 findContent.Background = b2;
                 findContent.BorderBrush = b3;
                 findContent.Foreground = f;
@@ -390,6 +400,10 @@ namespace Cloc4Notion
                 open.Background = b;
                 open.BorderBrush = f;
                 open.Foreground = f;
+
+                open2.Background = b;
+                open2.BorderBrush = f;
+                open2.Foreground = f;
 
                 findContent.Background = b;
                 findContent.BorderBrush = f;
@@ -424,6 +438,49 @@ namespace Cloc4Notion
         {
             _findWindow = new FindContentWindow(this);
             _findWindow.Show();
+        }
+
+        private void open2_Click(object sender, RoutedEventArgs e)
+        {
+            var ofd = new VistaFolderBrowserDialog();
+            ofd.Description = "Please select the obsidian vault directory";
+            ofd.Multiselect = false;
+
+            var dialog = ofd.ShowDialog();
+            if (dialog.HasValue && dialog.Value)
+            {
+                var name = new AlphaDirectoryInfo(ofd.SelectedPath).Name;
+
+                LoadObsidian(ofd.SelectedPath);
+                ApplyCurrentPageCountsUI();
+                ApplyTree();
+
+                MessageBox.Show($"'{name}' Sucessfully Loaded!", this.Title, MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
+        public void LoadObsidian(string path)
+        {
+            CurrentPage = null;
+            var vaultName = new AlphaDirectoryInfo(path).Name;
+            CurrentLoadedPage = new Page(vaultName, string.Empty);
+            CurrentLoadedPage.SubPages.Add(new Page(vaultName, string.Empty));
+
+            var files = AlphaDirectory.GetFiles(path, "*.md", SearchOption.AllDirectories);
+
+            foreach (var fileName in files)
+            {
+                string relativePath = string.Concat(vaultName, "\\", fileName.Substring(path.Length + 1));
+                string name = Path.GetFileNameWithoutExtension(fileName);
+                string content = AlphaFile.ReadAllText(fileName);
+
+                string parent = GetParent(relativePath, '\\').Replace('\\', '/');
+                Page currentSubPage = GetSelectedPage(parent, true);
+
+                currentSubPage.Add(new Page(name, content, parent));
+            }
+
+            CurrentPage = CurrentLoadedPage;
         }
     }
 }

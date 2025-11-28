@@ -8,11 +8,11 @@ using System.Windows;
 // 제어됩니다. 어셈블리와 관련된 정보를 수정하려면
 // 이러한 특성 값을 변경하세요.
 [assembly: AssemblyTitle("Cloc4Notion")]
-[assembly: AssemblyDescription("Count Words / Lines for Notion")]
+[assembly: AssemblyDescription("Count Words / Lines for Notion & Obsidian")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Cloc4Notion")]
-[assembly: AssemblyCopyright("Copyright © 2023~2024 MineEric64 All Right Reserved.")]
+[assembly: AssemblyCopyright("Copyright © 2023~2025 MineEric64 All Right Reserved.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -52,4 +52,4 @@ using System.Windows;
 // 기본값으로 할 수 있습니다.
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.2.0")]
-[assembly: AssemblyFileVersion("1.0.2.0")]
+[assembly: AssemblyFileVersion("1.1.3.0")]

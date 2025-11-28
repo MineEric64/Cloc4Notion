@@ -800,6 +800,9 @@
     <PackageReference Include="Markdig.Wpf">
       <Version>0.5.0.1</Version>
     </PackageReference>
+    <PackageReference Include="Ookii.Dialogs.Wpf">
+      <Version>5.0.1</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
