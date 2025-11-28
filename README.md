@@ -32,6 +32,7 @@ Unfortunately, The app supports Windows 32bit & 64bit only.
 - Count Page's Count
 - Search the content
 - Light / Dark Theme Support
+- Obsidian vaults
 
 ![demo2](https://github.com/MineEric64/Cloc4Notion/blob/main/docs/demo2.jpg?raw=true)
 
