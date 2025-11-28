@@ -40,6 +40,7 @@ Unfortunately, The app supports Windows 32bit & 64bit only.
 - [Unzip](https://github.com/yallie/unzip)
 - [AlphaFS](https://github.com/alphaleonis/AlphaFS)
 - [Markdig-WPF](https://github.com/Kryptos-FR/markdig.wpf)
+- [Ookii.Dialogs.Wpf](https://github.com/ookii-dialogs/ookii-dialogs-wpf)
 
 ## Credit
 - [Icon](https://dribbble.com/shots/14637467-Notion-Big-Sur-Icon)
