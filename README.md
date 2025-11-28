@@ -1,7 +1,7 @@
 # Cloc4Notion
 ![demo3](https://github.com/MineEric64/Cloc4Notion/blob/main/docs/demo3.png?raw=true)
  > [!NOTE]
- > Count All Page's Words / Lines (and More) for Notion
+ > Count All Page's Words / Lines (and More) for Notion & Obsidian
 
 - Absolutely Recursive
 
