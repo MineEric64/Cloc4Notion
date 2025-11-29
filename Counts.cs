@@ -16,6 +16,8 @@ namespace Cloc4Notion
         public int Page { get; set; } = 0;
         public int Picture { get; set; } = 0;
 
+        public Dictionary<string, int> Dict { get; set; } = new Dictionary<string, int>();
+
         public Counts Add(Counts count)
         {
             var count2 = new Counts();
@@ -28,6 +30,13 @@ namespace Cloc4Notion
             count2.Page = Page + count.Page;
             count2.Picture = Picture + count.Picture;
 
+            count2.Dict = new Dictionary<string, int>(Dict);
+            foreach (string key in count.Dict.Keys)
+            {
+                if (count2.Dict.ContainsKey(key)) count2.Dict[key] += count.Dict[key];
+                else count2.Dict.Add(key, count.Dict[key]);
+            }
+
             return count2;
         }
 
@@ -38,7 +47,8 @@ namespace Cloc4Notion
                 $"Character: {Character}\n" +
                 $"Blank: {Blank}\n" +
                 $"Page: {Page}\n" +
-                $"Picture: {Picture}";
+                $"Picture: {Picture}\n" +
+                $"Dict Count: {Dict.Count}";
         }
     }
 }

@@ -58,6 +58,7 @@ namespace Cloc4Notion
         public static bool IncludedSubPages { get; private set; } = true;
 
         private FindContentWindow _findWindow = null;
+        private Analysis _analysis = null;
 
         public MainWindow()
         {
@@ -71,6 +72,9 @@ namespace Cloc4Notion
 
         private void MainWindow_Closing(object sender, CancelEventArgs e)
         {
+            _findWindow?.Close();
+            _analysis?.Close();
+
             if (AlphaDirectory.Exists(TempDirectory)) AlphaDirectory.Delete(TempDirectory, true);
         }
 
@@ -389,6 +393,10 @@ namespace Cloc4Notion
                 findContent.BorderBrush = b3;
                 findContent.Foreground = f;
 
+                analysis.Background = b2;
+                analysis.BorderBrush = b3;
+                analysis.Foreground = f;
+
                 lightdark.Background = b2;
                 lightdark.BorderBrush = b3;
                 lightdark.Foreground = f;
@@ -409,6 +417,10 @@ namespace Cloc4Notion
                 findContent.BorderBrush = f;
                 findContent.Foreground = f;
 
+                analysis.Background = b;
+                analysis.BorderBrush = f;
+                analysis.Foreground = f;
+
                 lightdark.Background = b;
                 lightdark.BorderBrush = f;
                 lightdark.Foreground = f;
@@ -420,6 +432,7 @@ namespace Cloc4Notion
             ChangeTreeItemForeground();
 
             _findWindow?.ChangeTheme(IsLight);
+            _analysis?.ChangeTheme(IsLight);
         }
 
         private void ChangeTreeItemForeground(TreeViewItem item = null)
@@ -481,6 +494,12 @@ namespace Cloc4Notion
             }
 
             CurrentPage = CurrentLoadedPage;
+        }
+
+        private void analysis_Click(object sender, RoutedEventArgs e)
+        {
+            _analysis = new Analysis(this);
+            _analysis.Show();
         }
     }
 }

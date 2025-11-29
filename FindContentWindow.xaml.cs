@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -30,20 +31,33 @@ namespace Cloc4Notion
             _mainWindow = mainWindow;
         }
 
+        public void FindContentWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            var view = new GridView();
+            view.Columns.Add(new GridViewColumn { Header = "Name", DisplayMemberBinding = new Binding("Name"), Width = 300 });
+            view.Columns.Add(new GridViewColumn { Header = "Count", DisplayMemberBinding = new Binding("Count"), Width = 100 });
+
+            listView.View = view;
+            ChangeTheme(MainWindow.IsLight);
+        }
+
         private void findButton_Click(object sender, RoutedEventArgs e)
         {
             _foundPages.Clear();
             listView.Items.Clear();
+            string key = textBox.Text;
 
-            Search(textBox.Text, MainWindow.CurrentLoadedPage);            
+            Search(key, MainWindow.CurrentLoadedPage);            
 
             foreach (Page page in _foundPages)
             {
                 ListViewItem item = new ListViewItem();
                 item.Tag = page.FullName;
                 item.Content = page.Name;
+                int count = Regex.Matches(page.PlainContent, Regex.Escape(key)).Count;
+                object a = new { Name = page.Name, Count = count, Tag = page.FullName };
 
-                listView.Items.Add(item);
+                listView.Items.Add(a);
             }
         }
 
@@ -51,7 +65,7 @@ namespace Cloc4Notion
         {
             if (page == null)
             {
-                MessageBox.Show("Please search after loading Notion Page!", this.Name, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                MessageBox.Show("Please search after loading Notion Page or Obsidian vault!", this.Name, MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 return;
             }
 
@@ -66,14 +80,23 @@ namespace Cloc4Notion
         {
             if (e.AddedItems.Count <= 0) return;
 
-            var item = e.AddedItems[0] as ListViewItem;
+            //var item = e.AddedItems[0] as ListViewItem;
+            var item = e.AddedItems[0];
 
             if (item != null)
             {
-                MainWindow.CurrentPage = _mainWindow.GetSelectedPage((string)item.Tag);
+                var item2 = ConvertFromObjectToDictionary(item);
+                MainWindow.CurrentPage = _mainWindow.GetSelectedPage((string)item2["Tag"]);
+
+                //MainWindow.CurrentPage = _mainWindow.GetSelectedPage((string)item.Tag);
                 _mainWindow.ApplyCurrentPageCountsUI();
                 _mainWindow.Focus();
             }
+        }
+
+        public static Dictionary<string, object> ConvertFromObjectToDictionary(object arg)
+        {
+            return arg.GetType().GetProperties().ToDictionary(property => property.Name, property => property.GetValue(arg));
         }
 
         public void ChangeTheme(bool isLight)
@@ -108,7 +131,13 @@ namespace Cloc4Notion
             listView.Background = b;
             listView.BorderBrush = f;
             listView.Foreground = isLight ? listViewForeground : f;
-            foreach (ListViewItem item in listView.Items) item.Foreground = isLight ? listViewForeground : f;
+            foreach (object item0 in listView.Items)
+            {
+                if (item0 is ListViewItem item)
+                {
+                    item.Foreground = isLight ? listViewForeground : f;
+                }
+            }
         }
     }
 }

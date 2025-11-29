@@ -42,7 +42,13 @@ namespace Cloc4Notion
                     else
                     {
                         Count.Character += line.Length;
-                        foreach (string s in line.Split(' ')) Count.Word += s.Length;
+                        foreach (string s in line.Split(' '))
+                        {
+                            Count.Word += s.Length;
+
+                            if (Count.Dict.ContainsKey(s)) Count.Dict[s]++;
+                            else Count.Dict.Add(s, 1);
+                        }
                         Count.Line++;
                     }
                 }

@@ -737,10 +737,17 @@
     <Compile Include="AlphaFS\Win32Errors.cs" />
     <Compile Include="Counts.cs" />
     <Compile Include="Extensions\ExceptionManager.cs" />
+    <Compile Include="Analysis.xaml.cs">
+      <DependentUpon>Analysis.xaml</DependentUpon>
+    </Compile>
     <Compile Include="FindContentWindow.xaml.cs">
       <DependentUpon>FindContentWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Unzip.cs" />
+    <Page Include="Analysis.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="FindContentWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
