@@ -293,6 +293,12 @@ namespace Cloc4Notion
         {
             Page page = CurrentLoadedPage;
 
+            if (page == null)
+            {
+                MessageBox.Show("Error occured while unpacking Notion page file.\nPlease make sure that export option is valid.", "Cloc4Notion: Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
             TreeViewItem item = new TreeViewItem();
             item.Header = page.Name;
             item.Tag = page.FullName;
